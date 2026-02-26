@@ -1,15 +1,12 @@
+//
+//  DataUsageChartView.swift
+//  DataUsageChart
+//
+//  Created by Anton Marchanka on 2/26/26.
+//
+
 import SwiftUI
 import Charts
-
-// Helper for chart points (moved out of ViewBuilder to avoid result builder declaration error)
-private struct ChartPoint: Identifiable {
-    let id = UUID()
-    let app: String
-    let hour: Int
-    let minutes: Int
-    let colorHex: String?
-}
-
 
 // MARK: - View
 struct DataUsageChartView: View {
@@ -23,25 +20,23 @@ struct DataUsageChartView: View {
                     ProgressView().task { vm.load() }
                 case .error(let message):
                     ErrorStateView(message: message) { vm.load() }
-                case .loaded(let sessions):
-                    if let date = vm.targetDate {
-                        let daily = aggregate(sessions: sessions, for: date)
+                case .loaded:
+                    if let daily = vm.dailyUsage {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 16) {
                                 header(total: vm.totalMinutes, dateString: daily.date)
                                 chartSegmentPicker
                                 switch vm.selectedChart {
                                 case .categoryPie:
-                                    let categorySlices = categoryBreakdown(sessions: sessions, from: date)
-                                    if categorySlices.isEmpty {
+                                    if vm.categorySlices.isEmpty {
                                         Text("No category data for this day")
                                     } else {
-                                        CategoryPieChartView(slices: categorySlices)
+                                        CategoryPieChartView(slices: vm.categorySlices)
                                     }
                                 case .usageBar:
-                                    usageChart(daily: daily)
+                                    UsageBarChartView(daily: daily)
                                 }
-                                appList(sessions: sessions, targetDate: date, total: vm.totalMinutes)
+                                appList(rowItems: vm.rowItems, total: vm.totalMinutes)
                             }
                             .padding()
                         }
@@ -76,63 +71,9 @@ struct DataUsageChartView: View {
         }
     }
 
-    // Stacked hourly chart per app
+    // Ranked list of apps (row items from ViewModel, computed once on load)
     @ViewBuilder
-    private func usageChart(daily: DailyUsage) -> some View {
-      let points: [ChartPoint] = daily.sessionCategories.flatMap { sessionCategory in
-          sessionCategory.hourly.map { h in
-              ChartPoint(
-                app: sessionCategory.appName,
-                hour: h.hour,
-                minutes: h.minutes,
-                colorHex: sessionCategory.colorHex
-              )
-          }
-      }
-
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Hourly breakdown")
-                .font(.headline)
-
-            if points.isEmpty {
-                Text("No usage data for this day")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(height: 220)
-                    .frame(maxWidth: .infinity)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-            } else {
-                let maxY = max(points.map(\.minutes).max() ?? 0, 1)
-
-                Chart(points) { p in
-                    BarMark(
-                        x: .value("Hour", p.hour),
-                        y: .value("Minutes", p.minutes)
-                    )
-                    .foregroundStyle(by: .value("App", p.app))
-                }
-                .chartXScale(domain: 0...23)
-                .chartYScale(domain: 0...maxY)
-                .chartXAxis {
-                    AxisMarks(values: .stride(by: 2)) { value in
-                        if let hour = value.as(Int.self), (0...23).contains(hour) {
-                            AxisGridLine()
-                            AxisValueLabel(String(format: "%02d", hour))
-                        }
-                    }
-                }
-                .chartLegend(.hidden)
-                .frame(height: 220)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-            }
-        }
-    }
-
-    // Ranked list of apps (row items computed in UsageAggregator from sessions)
-    @ViewBuilder
-    private func appList(sessions: [Session], targetDate: Date, total: Int) -> some View {
-        let rowItems = appUsageRowItems(sessions: sessions, from: targetDate)
+    private func appList(rowItems: [AppUsageRowItem], total: Int) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             LazyVStack(alignment: .leading, spacing: 4) {
                 ForEach(rowItems) { item in

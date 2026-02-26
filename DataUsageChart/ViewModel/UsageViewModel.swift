@@ -1,3 +1,10 @@
+//
+//  UsageViewModel.swift
+//  DataUsageChart
+//
+//  Created by Anton Marchanka on 2/26/26.
+//
+
 import Foundation
 import Combine
 
@@ -18,6 +25,12 @@ final class UsageViewModel: ObservableObject {
     @Published private(set) var targetDate: Date?
     @Published var selectedChart: ChartSelection = .categoryPie
 
+    /// Derived once when sessions load; not recomputed on re-renders.
+    @Published private(set) var dailyUsage: DailyUsage?
+    @Published private(set) var rowItems: [AppUsageRowItem] = []
+    @Published private(set) var categorySlices: [CategorySlice] = []
+    @Published private(set) var totalMinutes: Int = 0
+
     private let repository: DataRepositoryProtocol
     private let targetDayString = "2026-02-23" // TODO: Change to current date or add UI element for this
 
@@ -32,23 +45,32 @@ final class UsageViewModel: ObservableObject {
 
     func load() {
         state = .loading
+        dailyUsage = nil
+        rowItems = []
+        categorySlices = []
+        totalMinutes = 0
+
         Task {
             do {
-                let sessions = try repository.loadSessions()
-                self.state = .loaded(sessions)
-
                 let date = try convertTargetDayStringToDate()
+                let sessions = try repository.loadSessions()
+
+                // Compute once; view reads these published values
+                let daily = aggregate(sessions: sessions, for: date)
+                let slices = categoryBreakdown(sessions: sessions, from: date)
+                let rows = appUsageRowItems(sessions: sessions, from: date)
+                let total = daily.sessionCategories.map { $0.totalMinutes }.reduce(0, +)
+
                 self.targetDate = date
+                self.dailyUsage = daily
+                self.categorySlices = slices
+                self.rowItems = rows
+                self.totalMinutes = total
+                self.state = .loaded(sessions)
             } catch {
                 self.state = .error(error.localizedDescription)
             }
         }
-    }
-
-    var totalMinutes: Int {
-        guard case .loaded(let sessions) = state, let date = targetDate else { return 0 }
-        let daily = aggregate(sessions: sessions, for: date)
-        return daily.sessionCategories.map { $0.totalMinutes }.reduce(0, +)
     }
 
     // MARK: - Private

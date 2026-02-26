@@ -2,7 +2,7 @@
 //  AppUsageRowItem.swift
 //  DataUsageChart
 //
-//  Data for a single row in the app usage list (no hourly breakdown).
+//  Created by Anton Marchanka on 2/26/26.
 //
 
 import Foundation

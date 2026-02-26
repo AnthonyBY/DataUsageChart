@@ -1,3 +1,10 @@
+//
+//  ErrorStateView.swift
+//  DataUsageChart
+//
+//  Created by Anton Marchanka on 2/26/26.
+//
+
 import SwiftUI
 
 struct ErrorStateView: View {

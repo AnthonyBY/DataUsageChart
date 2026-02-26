@@ -1,5 +1,5 @@
 //
-//  AppUsage.swift
+//  SessionCategory.swift
 //  DataUsageChart
 //
 //  Created by Anton Marchanka on 2/26/26.
