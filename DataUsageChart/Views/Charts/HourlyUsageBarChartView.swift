@@ -17,7 +17,7 @@ private struct ChartPoint: Identifiable {
 }
 
 /// Hourly stacked bar chart per app; takes `DailyUsage` (session categories with hourly breakdown).
-struct UsageBarChartView: View {
+struct HourlyUsageBarChartView: View {
     let daily: DailyUsage
 
     var body: some View {

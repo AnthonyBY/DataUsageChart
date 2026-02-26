@@ -13,11 +13,6 @@ struct HourlyUsage: Codable, Identifiable, Equatable {
     let minutes: Int
 }
 
-struct DailyUsage: Codable, Equatable {
-    let date: String
-    let sessionCategories: [SessionCategory]
-}
-
 extension HourlyUsage {
     static let previewData: [HourlyUsage] = [
         HourlyUsage(hour: 8, minutes: 10),

@@ -22,24 +22,7 @@ struct DataUsageChartView: View {
                     ErrorStateView(message: message) { vm.load() }
                 case .loaded:
                     if let daily = vm.dailyUsage {
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 16) {
-                                header(total: vm.totalMinutes, dateString: daily.date)
-                                chartSegmentPicker
-                                switch vm.selectedChart {
-                                case .categoryPie:
-                                    if vm.categorySlices.isEmpty {
-                                        Text("No category data for this day")
-                                    } else {
-                                        CategoryPieChartView(slices: vm.categorySlices)
-                                    }
-                                case .usageBar:
-                                    UsageBarChartView(daily: daily)
-                                }
-                                appList(rowItems: vm.rowItems, total: vm.totalMinutes)
-                            }
-                            .padding()
-                        }
+                        contentScrollView(daily: daily)
                     } else {
                         ProgressView()
                     }
@@ -57,6 +40,29 @@ struct DataUsageChartView: View {
             Text("Hourly").tag(ChartSelection.usageBar)
         }
         .pickerStyle(.segmented)
+    }
+
+    // Main scrollable content
+    @ViewBuilder
+    private func contentScrollView(daily: DailyUsage) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                header(total: vm.totalMinutes, dateString: daily.date)
+                chartSegmentPicker
+                switch vm.selectedChart {
+                case .categoryPie:
+                    if vm.categorySlices.isEmpty {
+                        Text("No category data for this day")
+                    } else {
+                        CategoryPieChartView(slices: vm.categorySlices)
+                    }
+                case .usageBar:
+                    HourlyUsageBarChartView(daily: daily)
+                }
+                appList(rowItems: vm.rowItems, total: vm.totalMinutes)
+            }
+            .padding()
+        }
     }
 
     // Header with date and total usage
@@ -83,6 +89,7 @@ struct DataUsageChartView: View {
         }
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
+
 
     // Helpers
     private func formatted(date: String) -> String {
