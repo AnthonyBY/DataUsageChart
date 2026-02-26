@@ -1,3 +1,12 @@
+//
+//  Color+hex.swift
+//  DataUsageChart
+//
+//  Created by Anton Marchanka on 2/26/26.
+//
+
+import SwiftUI
+
 extension Color {
     init?(hex: String) {
         let hexSanitized = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

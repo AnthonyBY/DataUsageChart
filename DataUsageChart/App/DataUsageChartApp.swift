@@ -11,7 +11,7 @@ import SwiftUI
 struct DataUsageChartApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DataUsageChartView()
         }
     }
 }
