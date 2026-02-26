@@ -8,7 +8,7 @@ struct HourlyUsage: Codable, Identifiable {
 
 struct DailyUsage: Codable {
     let date: String
-    let apps: [AppUsage]
+    let sessionCategories: [SessionCategory]
 }
 
 extension HourlyUsage {

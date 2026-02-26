@@ -8,21 +8,21 @@
 import SwiftUI
 
 struct AppUsageRowView: View {
-    let appUsage: AppUsage
+    let appUsage: SessionCategory
     let total: Int
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading) {
-                Text(appUsage.name)
+                Text(appUsage.appName)
                     .font(.body)
 
                 ProgressView(value: Double(appUsage.totalMinutes), total: Double(total))
                     .progressViewStyle(.linear)
-                    .tint(color(for: appUsage.colorHex, app: appUsage.name))
+                    .tint(color(for: appUsage.colorHex, app: appUsage.appName))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(4)
                 HStack(spacing: 0) {
-                    Text(appUsage.category ?? "Other")
+                    Text(appUsage.name ?? "Other")
                         .font(.body)
                         .foregroundStyle(.secondary)
                     Text(", ")
@@ -67,6 +67,6 @@ struct AppUsageRowView: View {
 
 #Preview {
     VStack {
-        AppUsageRowView(appUsage: AppUsage.preview, total: 300)
+        AppUsageRowView(appUsage: SessionCategory.preview, total: 300)
     }
 }

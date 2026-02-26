@@ -1,7 +1,6 @@
 import SwiftUI
 import Charts
 
-
 // Helper for chart points (moved out of ViewBuilder to avoid result builder declaration error)
 private struct ChartPoint: Identifiable {
     let id = UUID()
@@ -58,11 +57,16 @@ struct DataUsageChartView: View {
     // Stacked hourly chart per app
     @ViewBuilder
     private func usageChart(daily: DailyUsage) -> some View {
-        let points: [ChartPoint] = daily.apps.flatMap { app in
-            app.hourly.map { h in
-                ChartPoint(app: app.name, hour: h.hour, minutes: h.minutes, colorHex: app.colorHex)
-            }
-        }
+      let points: [ChartPoint] = daily.sessionCategories.flatMap { sessionCategory in
+          sessionCategory.hourly.map { h in
+              ChartPoint(
+                app: sessionCategory.appName,
+                hour: h.hour,
+                minutes: h.minutes,
+                colorHex: sessionCategory.colorHex
+              )
+          }
+      }
 
         VStack(alignment: .leading, spacing: 8) {
             Text("Hourly breakdown")
@@ -108,9 +112,9 @@ struct DataUsageChartView: View {
     private func appList(daily: DailyUsage, total: Int) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             LazyVStack(alignment: .leading, spacing: 4) {
-                ForEach(daily.apps) { app in
+                ForEach(daily.sessionCategories) { app in
                     AppUsageRowView(appUsage: app, total: total)
-                    Divider()
+                 //   Divider()
                 }
             }
         }

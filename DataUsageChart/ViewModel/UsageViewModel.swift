@@ -38,7 +38,7 @@ final class UsageViewModel: ObservableObject {
 
     var totalMinutes: Int {
         guard let daily else { return 0 }
-        return daily.apps.map { $0.totalMinutes }.reduce(0, +)
+        return daily.sessionCategories.map { $0.totalMinutes }.reduce(0, +)
     }
 
     // MARK: - Private

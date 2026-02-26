@@ -29,10 +29,10 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
         appBuckets[s.appName] = entry
     }
 
-    let apps: [AppUsage] = appBuckets.map { appName, v in
+    let apps: [SessionCategory] = appBuckets.map { appName, v in
         let hourly = (0...23).map { h in HourlyUsage(hour: h, minutes: v.hourly[h] ?? 0) }
-        return AppUsage(name: appName,
-                        category: v.category,
+        return SessionCategory(name: v.category ?? "Other",
+                               appName: appName,
                         colorHex: nil,
                         totalMinutes: v.totalMinutes,
                         sessions: v.sessionsCount,
@@ -43,5 +43,5 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
     formatter.dateFormat = "yyyy-MM-dd"
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
 
-    return DailyUsage(date: formatter.string(from: targetDate), apps: apps)
+    return DailyUsage(date: formatter.string(from: targetDate), sessionCategories: apps)
 }

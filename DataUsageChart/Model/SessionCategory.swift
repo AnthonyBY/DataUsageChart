@@ -7,27 +7,27 @@
 
 import Foundation
 
-struct AppUsage: Codable, Identifiable {
+struct SessionCategory: Codable, Identifiable {
     var id = UUID()
-    let name: String
-    let category: String?
+    let name: String?
+    let appName: String
     var colorHex: String? = nil
     let totalMinutes: Int
     let sessions: Int
     let hourly: [HourlyUsage]
 }
 
-extension AppUsage {
+extension SessionCategory {
     var sessionsText: String {
         let count = sessions
         return count == 1 ? "1 session" : "\(count) sessions"
     }
 }
 
-extension AppUsage {
-    static let preview = AppUsage(
-        name: "Clock",
-        category: "System",
+extension SessionCategory {
+    static let preview = SessionCategory(
+        name: "System",
+        appName: "Clock",
         colorHex: "#FF9500",
         totalMinutes: 78,
         sessions: 3,
