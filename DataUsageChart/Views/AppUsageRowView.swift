@@ -22,10 +22,10 @@ struct AppUsageRowView: View {
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(4)
                 HStack(spacing: 0) {
-                    Text(appUsage.name ?? "Other")
+                    Text(appUsage.name ?? "")
                         .font(.body)
                         .foregroundStyle(.secondary)
-                    Text(", ")
+                    Text(" - ")
                         .font(.body)
                         .foregroundStyle(.secondary)
                     Text(appUsage.sessionsText)
