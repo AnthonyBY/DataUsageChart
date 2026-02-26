@@ -32,13 +32,13 @@ final class UsageViewModel: ObservableObject {
 
     func load() {
         state = .loading
-        targetDate = nil
         Task {
             do {
-                let date = try makeTargetDate()
                 let sessions = try repository.loadSessions()
-                self.targetDate = date
                 self.state = .loaded(sessions)
+
+                let date = try convertTargetDayStringToDate()
+                self.targetDate = date
             } catch {
                 self.state = .error(error.localizedDescription)
             }
@@ -53,7 +53,7 @@ final class UsageViewModel: ObservableObject {
 
     // MARK: - Private
 
-    private func makeTargetDate() throws -> Date {
+    private func convertTargetDayStringToDate() throws -> Date {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
