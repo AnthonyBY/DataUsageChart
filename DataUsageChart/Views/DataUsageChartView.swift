@@ -74,6 +74,7 @@ struct DataUsageChartView: View {
                 .font(.headline)
                 .foregroundStyle(.secondary)
         }
+        .padding()
     }
 
     // Ranked list of apps (row items from ViewModel, computed once on load)
