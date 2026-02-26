@@ -71,3 +71,7 @@ struct HourlyUsageBarChartView: View {
         }
     }
 }
+
+#Preview {
+    HourlyUsageBarChartView(daily: DailyUsage.previewData)
+}

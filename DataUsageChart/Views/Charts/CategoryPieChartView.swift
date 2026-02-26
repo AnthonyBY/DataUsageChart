@@ -42,3 +42,7 @@ struct CategoryPieChartView: View {
         }
     }
 }
+
+#Preview {
+    CategoryPieChartView(slices: CategorySlice.previewData)
+}
