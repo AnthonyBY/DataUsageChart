@@ -21,12 +21,15 @@ struct AppUsageRowView: View {
                     .tint(color(for: appUsage.colorHex, app: appUsage.app))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(4)
-                HStack {
+                HStack(spacing: 0) {
                     Text(appUsage.category ?? "Other")
                         .font(.body)
                         .foregroundStyle(.secondary)
+                    Text(", ")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
                     Text(appUsage.sessionsText)
-                        .font(.subheadline)
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -39,7 +42,7 @@ struct AppUsageRowView: View {
                     .font(.body)
                     .monospacedDigit()
                 Text(percentage(appUsage.totalMinutes, of: total))
-                    .font(.caption)
+                    .font(.body)
                     .foregroundStyle(.secondary)
             }
             .frame(minWidth: 40, alignment: .trailing)

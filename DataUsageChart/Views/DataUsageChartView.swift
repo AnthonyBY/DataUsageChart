@@ -107,16 +107,14 @@ struct DataUsageChartView: View {
     @ViewBuilder
     private func appList(daily: DailyUsage, total: Int) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Apps")
-                .font(.headline)
-            LazyVStack(alignment: .leading, spacing: 8) {
+            LazyVStack(alignment: .leading, spacing: 4) {
                 ForEach(daily.apps) { app in
                     AppUsageRowView(appUsage: app, total: total)
                     Divider()
                 }
             }
         }
-        .padding()
+     //   .padding()
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
