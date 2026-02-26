@@ -32,3 +32,9 @@ extension Color {
         )
     }
 }
+
+extension String {
+    var hexColor: Color? {
+        Color(hex: self)
+    }
+}

@@ -2,15 +2,6 @@ import SwiftUI
 import Charts
 
 
-extension Int {
-    var hoursMinutesString: String {
-        let h = self / 60
-        let m = self % 60
-        if h > 0 { return String(format: "%dh %dm", h, m) }
-        return String(format: "%dm", m)
-    }
-}
-
 // Helper for chart points (moved out of ViewBuilder to avoid result builder declaration error)
 private struct ChartPoint: Identifiable {
     let id = UUID()
@@ -119,29 +110,7 @@ struct DataUsageChartView: View {
             Text("Apps")
                 .font(.headline)
             ForEach(daily.apps.sorted(by: { $0.totalMinutes > $1.totalMinutes })) { app in
-                HStack(spacing: 12) {
-                    Circle()
-                        .fill(color(for: app.colorHex, app: app.app))
-                        .frame(width: 12, height: 12)
-                    VStack(alignment: .leading) {
-                        Text(app.app)
-                            .font(.body)
-                        if let category = app.category, !category.isEmpty {
-                            Text(category)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    Spacer()
-                    VStack(alignment: .trailing) {
-                        Text(app.totalMinutes.hoursMinutesString)
-                            .font(.body).monospacedDigit()
-                        Text(percentage(app.totalMinutes, of: total))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .padding(.vertical, 8)
+                AppUsageRowView(appUsage: app, total: total)
                 Divider()
             }
         }
@@ -169,11 +138,6 @@ struct DataUsageChartView: View {
         return date
     }
 
-    private func percentage(_ part: Int, of total: Int) -> String {
-        guard total > 0 else { return "0%" }
-        let p = (Double(part) / Double(total)) * 100
-        return String(format: "%.0f%%", p)
-    }
 
     private func color(for hex: String?, app: String) -> Color {
         if let hex, let c = Color(hex: hex) { return c }
@@ -183,8 +147,3 @@ struct DataUsageChartView: View {
         return Color(hue: hue, saturation: 0.55, brightness: 0.9)
     }
 }
-
-#Preview {
-    DataUsageChartView()
-}
-

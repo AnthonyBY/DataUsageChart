@@ -8,7 +8,7 @@ final class UsageViewModel: ObservableObject {
     @Published private(set) var isLoading = false
 
     private let repository: UsageRepository
-    private let targetDayString = "2026-02-23"
+    private let targetDayString = "2026-02-23" // TODO: Change to current date or add UI element for this
 
     init(repository: UsageRepository) {
         self.repository = repository
