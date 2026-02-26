@@ -8,6 +8,8 @@
 import SwiftUI
 
 extension Color {
+    /// Creates a `Color` from a hexadecimal string representation.
+    /// Returns `nil` if the string cannot be parsed.
     init?(hex: String) {
         let hexSanitized = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
@@ -34,6 +36,7 @@ extension Color {
 }
 
 extension String {
+    /// Converts the string into a `Color` assuming it contains
     var hexColor: Color? {
         Color(hex: self)
     }

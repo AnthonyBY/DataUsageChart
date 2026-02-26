@@ -18,7 +18,7 @@ struct AppUsageRowView: View {
 
                 ProgressView(value: Double(appUsage.totalMinutes), total: Double(total))
                     .progressViewStyle(.linear)
-                    .tint(color(for: appUsage.colorHex, app: appUsage.appName))
+                    .tint(Color.appColor(hex: appUsage.colorHex, key: appUsage.appName))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(4)
                 HStack(spacing: 0) {
@@ -52,16 +52,13 @@ struct AppUsageRowView: View {
 
     private func percentage(_ part: Int, of total: Int) -> String {
         guard total > 0 else { return "0%" }
-        let p = (Double(part) / Double(total)) * 100
-        return String(format: "%.0f%%", p)
-    }
+        let percent = (Double(part) / Double(total)) * 100
 
-    private func color(for hex: String?, app: String) -> Color {
-        if let hex, let c = Color(hex: hex) { return c }
-        // deterministic fallback color per app name
-        let hash = abs(app.hashValue)
-        let hue = Double(hash % 256) / 255.0
-        return Color(hue: hue, saturation: 0.55, brightness: 0.9)
+        if percent < 1, percent > 0 {
+            return String(format: "%.1f%%", p)
+        } else {
+            return String(format: "%.0f%%", p)
+        }
     }
 }
 
