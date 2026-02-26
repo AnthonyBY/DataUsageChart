@@ -30,6 +30,7 @@ struct DataUsageChartView: View {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 16) {
                                 header(total: vm.totalMinutes, dateString: daily.date)
+                                chartSegmentPicker
                                 switch vm.selectedChart {
                                 case .categoryPie:
                                     CategoryPieChartView(slices: categorySlices)
@@ -48,6 +49,15 @@ struct DataUsageChartView: View {
             .navigationTitle("Usage")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+
+    // Segment to switch between category pie and hourly bar chart
+    private var chartSegmentPicker: some View {
+        Picker("Chart", selection: $vm.selectedChart) {
+            Text("By category").tag(ChartSelection.categoryPie)
+            Text("Hourly").tag(ChartSelection.usageBar)
+        }
+        .pickerStyle(.segmented)
     }
 
     // Header with date and total usage
