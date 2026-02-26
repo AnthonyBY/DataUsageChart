@@ -3,13 +3,13 @@ import SwiftUI
 
 // MARK: - Repository protocol
 @MainActor
-protocol UsageRepository {
+protocol DataRepositoryProtocol {
     func loadDailyUsage(for date: Date) throws -> DailyUsage
 }
 
 // MARK: - Local JSON implementation
 @MainActor
-struct LocalJSONUsageRepository: UsageRepository {
+struct DataRepository: DataRepositoryProtocol {
     private let fileName: String
 
     init(fileName: String = "mock-data") {

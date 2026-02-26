@@ -1,6 +1,8 @@
 import Foundation
 
 // MARK: - Aggregation / business logic
+
+/// Aggregates raw `Session` objects into a `DailyUsage` model for a specific calendar day
 func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(secondsFromGMT: 0)!
@@ -61,35 +63,3 @@ private func formatDate(_ date: Date) -> String {
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
     return formatter.string(from: date)
 }
-// MARK: - Category breakdown for charts
-struct CategoryUsageSlice: Identifiable, Equatable {
-    let id = UUID()
-    let category: String
-    let minutes: Int
-}
-
-struct CategoryUsageBreakdown: Equatable {
-    let slices: [CategoryUsageSlice]
-    var isEmpty: Bool { slices.isEmpty }
-}
-
-func makeCategoryBreakdown(from daily: DailyUsage) -> CategoryUsageBreakdown {
-    let normalized: (String?) -> String = { name in
-        guard let name, !name.isEmpty, name.lowercased() != "other" else { return "Other" }
-        return name
-    }
-
-    var sumByCategory: [String: Int] = [:]
-    for cat in daily.sessionCategories {
-        let name = normalized(cat.name)
-        sumByCategory[name, default: 0] += cat.totalMinutes
-    }
-
-    let slices = sumByCategory
-        .map { CategoryUsageSlice(category: $0.key, minutes: $0.value) }
-        .filter { $0.minutes > 0 }
-        .sorted { $0.minutes > $1.minutes }
-
-    return CategoryUsageBreakdown(slices: slices)
-}
-

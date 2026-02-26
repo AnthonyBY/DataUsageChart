@@ -17,16 +17,16 @@ final class UsageViewModel: ObservableObject {
     @Published private(set) var state: LoadState = .loading
     @Published var selectedChart: ChartSelection = .categoryPie
 
-    private let repository: UsageRepository
+    private let repository: DataRepositoryProtocol
     private let targetDayString = "2026-02-23" // TODO: Change to current date or add UI element for this
 
-    init(repository: UsageRepository, selectedChart: ChartSelection = .categoryPie) {
+    init(repository: DataRepositoryProtocol, selectedChart: ChartSelection = .categoryPie) {
         self.repository = repository
         self.selectedChart = selectedChart
     }
 
     convenience init(selectedChart: ChartSelection = .categoryPie) {
-        self.init(repository: LocalJSONUsageRepository(), selectedChart: selectedChart)
+        self.init(repository: DataRepository(), selectedChart: selectedChart)
     }
 
     func load() {
