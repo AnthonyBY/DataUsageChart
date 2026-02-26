@@ -16,7 +16,6 @@ struct CategoryPieChartView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("By category")
                 .font(.headline)
-                .padding()
 
             if slices.isEmpty {
                 Text("No usage data for this day")
@@ -42,6 +41,7 @@ struct CategoryPieChartView: View {
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             }
         }
+        .padding()
     }
 }
 
