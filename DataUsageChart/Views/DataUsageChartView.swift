@@ -47,7 +47,7 @@ private struct ChartPoint: Identifiable {
 }
 
 // MARK: - View
-struct ContentView: View {
+struct DataUsageChartView: View {
     @StateObject private var vm = UsageViewModel(repository: LocalJSONUsageRepository())
 
     var body: some View {
@@ -211,6 +211,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    DataUsageChartView()
 }
 
