@@ -11,8 +11,8 @@ struct AppUsageRowItem: Identifiable {
     let id = UUID()
     let appName: String
     let categoryName: String
-    let totalMinutes: Int
-    let sessionsCount: Int
+    var totalMinutes: Int
+    var sessionsCount: Int
     let colorHex: String?
 
     var sessionsText: String {

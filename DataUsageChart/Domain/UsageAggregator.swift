@@ -8,35 +8,30 @@ func appUsageRowItems(sessions: [Session], from targetDate: Date) -> [AppUsageRo
     calendar.timeZone = TimeZone(secondsFromGMT: 0)!
 
     let dayStart = calendar.startOfDay(for: targetDate)
-    guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
-        return []
-    }
 
-    let daySessions = sessions.filter { s in
-        s.startTimestamp < dayEnd && s.endTimestamp > dayStart
-    }
-
-    let normalizedCategory: (String?) -> String = { name in
-        guard let name, !name.isEmpty, name.lowercased() != "other" else { return "Other" }
-        return name
-    }
-
-    var appBuckets: [String: (category: String, totalMinutes: Int, sessionsCount: Int)] = [:]
-    for s in daySessions {
-        let clipStart = max(s.startTimestamp, dayStart)
-        let clipEnd = min(s.endTimestamp, dayEnd)
+    var items: [AppUsageRowItem] = []
+    for session in sessions {
+        let clipStart = max(session.startTimestamp, dayStart)
+        let clipEnd = min(session.endTimestamp, Date())
         let minutes = max(0, Int(clipEnd.timeIntervalSince(clipStart) / 60))
         guard minutes > 0 else { continue }
 
-        var entry = appBuckets[s.appName] ?? (category: normalizedCategory(s.category), totalMinutes: 0, sessionsCount: 0)
-        entry.totalMinutes += minutes
-        entry.sessionsCount += 1
-        appBuckets[s.appName] = entry
+        let categoryName = session.category ?? "Others"
+        if let idx = items.firstIndex(where: { $0.appName == session.appName }) {
+            var existing = items[idx]
+            existing.totalMinutes += minutes
+            existing.sessionsCount += 1
+            items[idx] = existing
+        } else {
+            items.append(AppUsageRowItem(appName: session.appName,
+                                         categoryName: categoryName,
+                                         totalMinutes: minutes,
+                                         sessionsCount: 1,
+                                         colorHex: nil))
+        }
     }
 
-    return appBuckets
-        .map { AppUsageRowItem(appName: $0.key, categoryName: $0.value.category, totalMinutes: $0.value.totalMinutes, sessionsCount: $0.value.sessionsCount, colorHex: nil) }
-        .sorted { $0.totalMinutes > $1.totalMinutes }
+    return items.sorted { $0.totalMinutes > $1.totalMinutes }
 }
 
 /// Aggregates raw `Session` objects into a `DailyUsage` model for a specific calendar day
