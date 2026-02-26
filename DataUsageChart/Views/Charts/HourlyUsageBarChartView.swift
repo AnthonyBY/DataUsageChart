@@ -65,6 +65,7 @@ struct HourlyUsageBarChartView: View {
                 }
                 .chartLegend(.hidden)
                 .frame(height: 220)
+                .padding()
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             }

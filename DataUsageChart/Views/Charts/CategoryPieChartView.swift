@@ -37,6 +37,7 @@ struct CategoryPieChartView: View {
                 .chartLegend(position: .bottom, spacing: 8)
                 .frame(height: 220)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding()
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             }
         }

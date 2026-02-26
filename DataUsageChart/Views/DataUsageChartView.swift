@@ -61,7 +61,6 @@ struct DataUsageChartView: View {
                 }
                 appList(rowItems: vm.rowItems, total: vm.totalMinutes)
             }
-            .padding()
         }
     }
 
@@ -86,6 +85,7 @@ struct DataUsageChartView: View {
                     AppUsageRowView(item: item, total: total)
                 }
             }
+            .padding()
         }
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
