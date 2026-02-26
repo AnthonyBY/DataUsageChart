@@ -73,6 +73,26 @@ final class UsageViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Formatting
+    func format(dateString: String) -> String {
+        // Try to parse ISO and format nicely
+        let iso = ISO8601DateFormatter()
+        if let d = iso.date(from: dateString) {
+            let f = DateFormatter()
+            f.dateStyle = .full
+            return f.string(from: d)
+        }
+        // Fallback if just yyyy-MM-dd
+        let fIn = DateFormatter()
+        fIn.dateFormat = "yyyy-MM-dd"
+        if let d = fIn.date(from: dateString) {
+            let fOut = DateFormatter()
+            fOut.dateStyle = .full
+            return fOut.string(from: d)
+        }
+        return dateString
+    }
+
     // MARK: - Private
 
     private func convertTargetDayStringToDate() throws -> Date {

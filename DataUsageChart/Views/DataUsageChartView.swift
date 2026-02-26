@@ -69,7 +69,7 @@ struct DataUsageChartView: View {
     @ViewBuilder
     private func header(total: Int, dateString: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(formatted(date: dateString))
+            Text(vm.format(dateString: dateString))
                 .font(.title2).bold()
             Text(total.hoursMinutesString + " total")
                 .font(.headline)
@@ -88,27 +88,6 @@ struct DataUsageChartView: View {
             }
         }
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
-    }
-
-
-    // Helpers
-    private func formatted(date: String) -> String {
-        // Try to parse ISO and format nicely
-        let iso = ISO8601DateFormatter()
-        if let d = iso.date(from: date) {
-            let f = DateFormatter()
-            f.dateStyle = .full
-            return f.string(from: d)
-        }
-        // Fallback if just yyyy-MM-dd
-        let fIn = DateFormatter()
-        fIn.dateFormat = "yyyy-MM-dd"
-        if let d = fIn.date(from: date) {
-            let fOut = DateFormatter()
-            fOut.dateStyle = .full
-            return fOut.string(from: d)
-        }
-        return date
     }
 }
 
