@@ -47,7 +47,7 @@ struct DataUsageChartView: View {
     private func contentScrollView(daily: DailyUsage) -> some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                header(total: vm.totalMinutes, dateString: daily.date)
+                header(total: vm.totalMinutes, formattedDate: vm.formattedDateString)
                 chartSegmentPicker
                 switch vm.selectedChart {
                 case .categoryPie:
@@ -67,9 +67,9 @@ struct DataUsageChartView: View {
 
     // Header with date and total usage
     @ViewBuilder
-    private func header(total: Int, dateString: String) -> some View {
+    private func header(total: Int, formattedDate: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(vm.format(dateString: dateString))
+            Text(formattedDate)
                 .font(.title2).bold()
             Text(total.hoursMinutesString + " total")
                 .font(.headline)

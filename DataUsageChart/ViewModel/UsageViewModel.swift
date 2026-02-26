@@ -30,8 +30,23 @@ final class UsageViewModel: ObservableObject {
     @Published private(set) var rowItems: [AppUsageRowItem] = []
     @Published private(set) var categorySlices: [CategorySlice] = []
     @Published private(set) var totalMinutes: Int = 0
+    /// Display string for the target date (e.g. "Monday, February 23, 2026"); computed once on load.
+    @Published private(set) var formattedDateString: String = ""
 
     private let repository: DataRepositoryProtocol
+
+    private static let iso8601Formatter: ISO8601DateFormatter = ISO8601DateFormatter()
+    private static let fullDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateStyle = .full
+        return f
+    }()
+    private static let yyyyMMddFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        f.timeZone = TimeZone(secondsFromGMT: 0)
+        return f
+    }()
     private let targetDayString = "2026-02-23" // TODO: Change to current date or add UI element for this
 
     init(repository: DataRepositoryProtocol, selectedChart: ChartSelection = .categoryPie) {
@@ -49,6 +64,7 @@ final class UsageViewModel: ObservableObject {
         rowItems = []
         categorySlices = []
         totalMinutes = 0
+        formattedDateString = ""
 
         Task {
             do {
@@ -63,6 +79,7 @@ final class UsageViewModel: ObservableObject {
 
                 self.targetDate = date
                 self.dailyUsage = daily
+                self.formattedDateString = Self.formatDateStringForDisplay(daily.date)
                 self.categorySlices = slices
                 self.rowItems = rows
                 self.totalMinutes = total
@@ -73,27 +90,17 @@ final class UsageViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Formatting
-    func format(dateString: String) -> String {
-        // Try to parse ISO and format nicely
-        let iso = ISO8601DateFormatter()
-        if let d = iso.date(from: dateString) {
-            let f = DateFormatter()
-            f.dateStyle = .full
-            return f.string(from: d)
+    // MARK: - Private
+
+    private static func formatDateStringForDisplay(_ dateString: String) -> String {
+        if let d = iso8601Formatter.date(from: dateString) {
+            return fullDateFormatter.string(from: d)
         }
-        // Fallback if just yyyy-MM-dd
-        let fIn = DateFormatter()
-        fIn.dateFormat = "yyyy-MM-dd"
-        if let d = fIn.date(from: dateString) {
-            let fOut = DateFormatter()
-            fOut.dateStyle = .full
-            return fOut.string(from: d)
+        if let d = yyyyMMddFormatter.date(from: dateString) {
+            return fullDateFormatter.string(from: d)
         }
         return dateString
     }
-
-    // MARK: - Private
 
     private func convertTargetDayStringToDate() throws -> Date {
         let formatter = DateFormatter()
