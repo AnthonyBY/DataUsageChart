@@ -2,20 +2,8 @@ import Foundation
 
 // MARK: - Aggregation / business logic
 func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
-    // Build day interval [start, end)
     let calendar = Calendar(identifier: .gregorian)
-
-    let dayStart = calendar.startOfDay(for: targetDate)
-    let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart)!
-
-    // Clip sessions to the day and fix invalid end<start entries
-    let daySessions = sessions.compactMap { s -> Session? in
-        let start = max(s.startTimestamp, dayStart)
-        let rawEnd = max(s.endTimestamp, s.startTimestamp)
-        let end = min(rawEnd, dayEnd)
-        guard end > start else { return nil }
-        return Session(id: s.id, appName: s.appName, category: s.category, startTimestamp: start, endTimestamp: end)
-    }
+    let daySessions = sessions
 
     // Group by app and accumulate total + hourly buckets
     var appBuckets: [String: (category: String?, totalMinutes: Int, hourly: [Int: Int], sessionsCount: Int)] = [:]
@@ -43,7 +31,7 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
 
     let apps: [AppUsage] = appBuckets.map { appName, v in
         let hourly = (0...23).map { h in HourlyUsage(hour: h, minutes: v.hourly[h] ?? 0) }
-        return AppUsage(app: appName,
+        return AppUsage(name: appName,
                         category: v.category,
                         colorHex: nil,
                         totalMinutes: v.totalMinutes,
@@ -57,4 +45,3 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
 
     return DailyUsage(date: formatter.string(from: targetDate), apps: apps)
 }
-

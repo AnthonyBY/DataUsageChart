@@ -9,7 +9,7 @@ import Foundation
 
 struct AppUsage: Codable, Identifiable {
     var id = UUID()
-    let app: String
+    let name: String
     let category: String?
     var colorHex: String? = nil
     let totalMinutes: Int
@@ -26,7 +26,7 @@ extension AppUsage {
 
 extension AppUsage {
     static let preview = AppUsage(
-        app: "Clock",
+        name: "Clock",
         category: "System",
         colorHex: "#FF9500",
         totalMinutes: 78,

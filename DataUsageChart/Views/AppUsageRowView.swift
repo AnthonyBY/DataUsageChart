@@ -13,12 +13,12 @@ struct AppUsageRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading) {
-                Text(appUsage.app)
+                Text(appUsage.name)
                     .font(.body)
 
                 ProgressView(value: Double(appUsage.totalMinutes), total: Double(total))
                     .progressViewStyle(.linear)
-                    .tint(color(for: appUsage.colorHex, app: appUsage.app))
+                    .tint(color(for: appUsage.colorHex, app: appUsage.name))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(4)
                 HStack(spacing: 0) {

@@ -14,6 +14,10 @@ final class UsageViewModel: ObservableObject {
         self.repository = repository
     }
 
+    convenience init() {
+        self.init(repository: LocalJSONUsageRepository())
+    }
+
     func load() {
         guard !isLoading else { return }
         isLoading = true

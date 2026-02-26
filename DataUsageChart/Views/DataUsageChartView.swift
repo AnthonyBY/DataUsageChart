@@ -13,7 +13,7 @@ private struct ChartPoint: Identifiable {
 
 // MARK: - View
 struct DataUsageChartView: View {
-    @StateObject private var vm = UsageViewModel(repository: LocalJSONUsageRepository())
+    @StateObject private var vm = UsageViewModel()
 
     var body: some View {
         NavigationStack {
@@ -60,7 +60,7 @@ struct DataUsageChartView: View {
     private func usageChart(daily: DailyUsage) -> some View {
         let points: [ChartPoint] = daily.apps.flatMap { app in
             app.hourly.map { h in
-                ChartPoint(app: app.app, hour: h.hour, minutes: h.minutes, colorHex: app.colorHex)
+                ChartPoint(app: app.name, hour: h.hour, minutes: h.minutes, colorHex: app.colorHex)
             }
         }
 
