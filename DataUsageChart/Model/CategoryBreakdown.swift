@@ -10,5 +10,5 @@ import Foundation
 struct CategorySlice: Identifiable, Equatable {
     let id = UUID()
     let category: String
-    let minutes: Int
+    var minutes: Int
 }

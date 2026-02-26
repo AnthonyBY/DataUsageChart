@@ -26,14 +26,18 @@ struct DataUsageChartView: View {
                 case .loaded(let sessions):
                     if let date = vm.targetDate {
                         let daily = aggregate(sessions: sessions, for: date)
-                        let categorySlices = categoryBreakdown(sessions: sessions, for: date)
                         ScrollView {
                             VStack(alignment: .leading, spacing: 16) {
                                 header(total: vm.totalMinutes, dateString: daily.date)
                                 chartSegmentPicker
                                 switch vm.selectedChart {
                                 case .categoryPie:
-                                    CategoryPieChartView(slices: categorySlices)
+                                    let categorySlices = categoryBreakdown(sessions: sessions, from: date)
+                                    if categorySlices.isEmpty {
+                                        Text("No category data for this day")
+                                    } else {
+                                        CategoryPieChartView(slices: categorySlices)
+                                    }
                                 case .usageBar:
                                     usageChart(daily: daily)
                                 }

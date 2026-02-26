@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Aggregation / business logic
 
-/// App list row data from raw sessions for a given day (no hourly breakdown).
+/// App list row data from raw sessions for a given day
 func appUsageRowItems(sessions: [Session], from targetDate: Date) -> [AppUsageRowItem] {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(secondsFromGMT: 0)!
@@ -34,10 +34,45 @@ func appUsageRowItems(sessions: [Session], from targetDate: Date) -> [AppUsageRo
     return items.sorted { $0.totalMinutes > $1.totalMinutes }
 }
 
-/// Aggregates raw `Session` objects into a `DailyUsage` model for a specific calendar day
+/// Aggregates raw `Session` objects into a `CategorySlice` from targetDate 
+func categoryBreakdown(sessions: [Session], from targetDate: Date) -> [CategorySlice] {
+    var calendar = Calendar(identifier: .gregorian)
+
+    let dayStart = calendar.startOfDay(for: targetDate)
+    let daySessions = sessions.filter { session in
+        session.endTimestamp > dayStart
+    }
+
+    let normalized: (String?) -> String = { name in
+        guard let name, !name.isEmpty, name.lowercased() != "other" else { return "Other" }
+        return name
+    }
+
+    var slices: [CategorySlice] = []
+    for session in daySessions {
+        let clipStart = max(session.startTimestamp, dayStart)
+        let clipEnd = min(session.endTimestamp, Date())
+        let minutes = max(0, Int(clipEnd.timeIntervalSince(clipStart) / 60))
+        guard minutes > 0 else { continue }
+
+        let name = normalized(session.category)
+        if let idx = slices.firstIndex(where: { $0.category == name }) {
+            var existing = slices[idx]
+            existing.minutes += minutes
+            slices[idx] = existing
+        } else {
+            slices.append(CategorySlice(category: name, minutes: minutes))
+        }
+    }
+
+    return slices
+        .filter { $0.minutes > 0 }
+        .sorted { $0.minutes > $1.minutes }
+}
+
+/// Aggregates raw `Session` objects into a `DailyUsage` model for a specific calendar day (can be used for Bar Hours Chart)
 func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
     var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
 
     let dayStart = calendar.startOfDay(for: targetDate)
     guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
@@ -87,41 +122,6 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
     }.sorted { $0.totalMinutes > $1.totalMinutes }
 
     return DailyUsage(date: formatDate(targetDate), sessionCategories: apps)
-}
-
-/// Lazy-computed category breakdown from raw sessions for a given day (for pie chart).
-func categoryBreakdown(sessions: [Session], for targetDate: Date) -> [CategorySlice] {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
-
-    let dayStart = calendar.startOfDay(for: targetDate)
-    guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
-        return []
-    }
-
-    let daySessions = sessions.filter { s in
-        s.startTimestamp < dayEnd && s.endTimestamp > dayStart
-    }
-
-    let normalized: (String?) -> String = { name in
-        guard let name, !name.isEmpty, name.lowercased() != "other" else { return "Other" }
-        return name
-    }
-
-    var sumByCategory: [String: Int] = [:]
-    for s in daySessions {
-        let clipStart = max(s.startTimestamp, dayStart)
-        let clipEnd = min(s.endTimestamp, dayEnd)
-        let minutes = max(0, Int(clipEnd.timeIntervalSince(clipStart) / 60))
-        guard minutes > 0 else { continue }
-        let name = normalized(s.category)
-        sumByCategory[name, default: 0] += minutes
-    }
-
-    return sumByCategory
-        .map { CategorySlice(category: $0.key, minutes: $0.value) }
-        .filter { $0.minutes > 0 }
-        .sorted { $0.minutes > $1.minutes }
 }
 
 private func formatDate(_ date: Date) -> String {
