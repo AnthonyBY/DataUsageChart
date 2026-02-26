@@ -1,0 +1,33 @@
+//
+//  AppUsageRowItem.swift
+//  DataUsageChart
+//
+//  Data for a single row in the app usage list (no hourly breakdown).
+//
+
+import Foundation
+
+struct AppUsageRowItem: Identifiable {
+    let id = UUID()
+    let appName: String
+    let categoryName: String
+    let totalMinutes: Int
+    let sessionsCount: Int
+    let colorHex: String?
+
+    var sessionsText: String {
+        sessionsCount == 1 ? "1 session" : "\(sessionsCount) sessions"
+    }
+}
+
+extension AppUsageRowItem {
+    init(from sessionCategory: SessionCategory) {
+        self.appName = sessionCategory.appName
+        self.categoryName = (sessionCategory.name?.isEmpty == false && sessionCategory.name?.lowercased() != "other")
+            ? (sessionCategory.name ?? "Other")
+            : "Other"
+        self.totalMinutes = sessionCategory.totalMinutes
+        self.sessionsCount = sessionCategory.sessions
+        self.colorHex = sessionCategory.colorHex
+    }
+}

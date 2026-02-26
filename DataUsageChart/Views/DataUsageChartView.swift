@@ -37,7 +37,7 @@ struct DataUsageChartView: View {
                                 case .usageBar:
                                     usageChart(daily: daily)
                                 }
-                                appList(daily: daily, total: vm.totalMinutes)
+                                appList(sessions: sessions, targetDate: date, total: vm.totalMinutes)
                             }
                             .padding()
                         }
@@ -125,18 +125,17 @@ struct DataUsageChartView: View {
         }
     }
 
-    // Ranked list of apps
+    // Ranked list of apps (row items computed in UsageAggregator from sessions)
     @ViewBuilder
-    private func appList(daily: DailyUsage, total: Int) -> some View {
+    private func appList(sessions: [Session], targetDate: Date, total: Int) -> some View {
+        let rowItems = appUsageRowItems(sessions: sessions, from: targetDate)
         VStack(alignment: .leading, spacing: 8) {
             LazyVStack(alignment: .leading, spacing: 4) {
-                ForEach(daily.sessionCategories) { app in
-                    AppUsageRowView(appUsage: app, total: total)
-                 //   Divider()
+                ForEach(rowItems) { item in
+                    AppUsageRowView(item: item, total: total)
                 }
             }
         }
-     //   .padding()
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 

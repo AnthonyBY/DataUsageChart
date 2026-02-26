@@ -8,27 +8,28 @@
 import SwiftUI
 
 struct AppUsageRowView: View {
-    let appUsage: SessionCategory
+    let item: AppUsageRowItem
     let total: Int
+
     var body: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading) {
-                Text(appUsage.appName)
+                Text(item.appName)
                     .font(.body)
 
-                ProgressView(value: Double(appUsage.totalMinutes), total: Double(total))
+                ProgressView(value: Double(item.totalMinutes), total: Double(total))
                     .progressViewStyle(.linear)
-                    .tint(Color.appColor(hex: appUsage.colorHex, key: appUsage.appName))
+                    .tint(Color.appColor(hex: item.colorHex, key: item.appName))
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(4)
                 HStack(spacing: 0) {
-                    Text(appUsage.name ?? "")
+                    Text(item.categoryName)
                         .font(.body)
                         .foregroundStyle(.secondary)
                     Text(" - ")
                         .font(.body)
                         .foregroundStyle(.secondary)
-                    Text(appUsage.sessionsText)
+                    Text(item.sessionsText)
                         .font(.body)
                         .foregroundStyle(.secondary)
                 }
@@ -38,10 +39,10 @@ struct AppUsageRowView: View {
             Spacer()
 
             VStack(alignment: .trailing) {
-                Text(appUsage.totalMinutes.hoursMinutesString)
+                Text(item.totalMinutes.hoursMinutesString)
                     .font(.body)
                     .monospacedDigit()
-                Text(percentage(appUsage.totalMinutes, of: total))
+                Text(percentage(item.totalMinutes, of: total))
                     .font(.body)
                     .foregroundStyle(.secondary)
             }
@@ -64,6 +65,6 @@ struct AppUsageRowView: View {
 
 #Preview {
     VStack {
-        AppUsageRowView(appUsage: SessionCategory.preview, total: 300)
+        AppUsageRowView(item: AppUsageRowItem(from: SessionCategory.preview), total: 300)
     }
 }

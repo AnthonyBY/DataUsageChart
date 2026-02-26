@@ -2,6 +2,43 @@ import Foundation
 
 // MARK: - Aggregation / business logic
 
+/// App list row data from raw sessions for a given day (no hourly breakdown).
+func appUsageRowItems(sessions: [Session], from targetDate: Date) -> [AppUsageRowItem] {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+
+    let dayStart = calendar.startOfDay(for: targetDate)
+    guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
+        return []
+    }
+
+    let daySessions = sessions.filter { s in
+        s.startTimestamp < dayEnd && s.endTimestamp > dayStart
+    }
+
+    let normalizedCategory: (String?) -> String = { name in
+        guard let name, !name.isEmpty, name.lowercased() != "other" else { return "Other" }
+        return name
+    }
+
+    var appBuckets: [String: (category: String, totalMinutes: Int, sessionsCount: Int)] = [:]
+    for s in daySessions {
+        let clipStart = max(s.startTimestamp, dayStart)
+        let clipEnd = min(s.endTimestamp, dayEnd)
+        let minutes = max(0, Int(clipEnd.timeIntervalSince(clipStart) / 60))
+        guard minutes > 0 else { continue }
+
+        var entry = appBuckets[s.appName] ?? (category: normalizedCategory(s.category), totalMinutes: 0, sessionsCount: 0)
+        entry.totalMinutes += minutes
+        entry.sessionsCount += 1
+        appBuckets[s.appName] = entry
+    }
+
+    return appBuckets
+        .map { AppUsageRowItem(appName: $0.key, categoryName: $0.value.category, totalMinutes: $0.value.totalMinutes, sessionsCount: $0.value.sessionsCount, colorHex: nil) }
+        .sorted { $0.totalMinutes > $1.totalMinutes }
+}
+
 /// Aggregates raw `Session` objects into a `DailyUsage` model for a specific calendar day
 func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
     var calendar = Calendar(identifier: .gregorian)
