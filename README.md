@@ -1,8 +1,6 @@
 # DataUsageChart
 
-A single-screen iOS app that visualizes app usage data for a given day, similar in concept to [StayFree](https://stayfree.app/). Built for the assignment:
-
-> Your goal is to create some UI around the attached usage data sample. This is similar to the StayFree app itself (though the iOS StayFree app is unpolished). Please build a **single-screen iOS UI** for the data from **February 23, 2026**. Feel free to use whatever tools and charting libraries you wish; I'll leave the majority of the UI details up to you.
+A single-screen iOS app that visualizes app usage data for a given day, similar in concept to [StayFree](https://stayfree.app/). 
 
 ![Data usage screen](dataUsageScreenshot.jpg)
 
@@ -22,7 +20,8 @@ Data is read from a bundled JSON sample (`mock-data.json`). Sessions with `categ
 ## Tech stack
 
 - **SwiftUI** for the UI
-- **Swift Charts** (Apple) for the pie and bar charts
+- **Classic MVVM architecture** (View + ViewModel + Repository separation)
+- **Swift Charts** (Apple) for the pie and bar charts. The deployment target can be lowered to **iOS 16** if the native `SectorMark`-based pie chart (introduced in iOS 17) is not required.
 - **iOS 17.6+** (Xcode 26.x / Swift 6)
 - No third-party charting or UI libraries
 
@@ -34,7 +33,7 @@ Data is read from a bundled JSON sample (`mock-data.json`). Sessions with `categ
 ## How to run
 
 1. Clone the repo and open `DataUsageChart.xcodeproj` in Xcode.
-2. Select the **DataUsageChart** scheme and an iOS 18+ simulator or device.
+2. Select the **DataUsageChart** scheme and an iOS 17+ simulator or device.
 3. Build and run (⌘R).
 
 The app loads usage from `DataUsageChart/Resources/mock-data.json` and displays the February 23, 2026 view.
