@@ -17,6 +17,7 @@ struct SessionCategory: Codable, Identifiable, Equatable {
     let hourly: [HourlyUsage]
 }
 
+
 extension SessionCategory {
     var sessionsText: String {
         let count = sessions

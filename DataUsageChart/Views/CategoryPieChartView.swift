@@ -1,5 +1,19 @@
+//
+//  CategoryPieChartView.swift
+//  DataUsageChart
+//
+//  Created by Anton Marchanka on 2/26/26.
+//
+
+
 import SwiftUI
 import Charts
+
+struct CategorySlice: Identifiable {
+    let id = UUID()
+    let category: String
+    let minutes: Int
+}
 
 struct CategoryPieChartView: View {
     let daily: DailyUsage

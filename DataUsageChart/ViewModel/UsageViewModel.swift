@@ -30,12 +30,7 @@ final class UsageViewModel: ObservableObject {
     }
 
     func load() {
-        switch state {
-        case .loading: return
-        default: break
-        }
         state = .loading
-
         Task {
             do {
                 let date = try makeTargetDate()
