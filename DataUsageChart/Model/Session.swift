@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Session: Codable, Identifiable {
+struct Session: Codable, Identifiable, Equatable {
     let id: String
     let appName: String
     let category: String?

@@ -3,7 +3,7 @@ import Combine
 
 enum LoadState: Equatable {
     case loading
-    case loaded(DailyUsage)
+    case loaded([Session])
     case error(String)
 }
 
@@ -15,6 +15,7 @@ enum ChartSelection: Equatable {
 @MainActor
 final class UsageViewModel: ObservableObject {
     @Published private(set) var state: LoadState = .loading
+    @Published private(set) var targetDate: Date?
     @Published var selectedChart: ChartSelection = .categoryPie
 
     private let repository: DataRepositoryProtocol
@@ -31,11 +32,13 @@ final class UsageViewModel: ObservableObject {
 
     func load() {
         state = .loading
+        targetDate = nil
         Task {
             do {
                 let date = try makeTargetDate()
-                let daily = try repository.loadDailyUsage(for: date)
-                self.state = .loaded(daily)
+                let sessions = try repository.loadSessions()
+                self.targetDate = date
+                self.state = .loaded(sessions)
             } catch {
                 self.state = .error(error.localizedDescription)
             }
@@ -43,12 +46,9 @@ final class UsageViewModel: ObservableObject {
     }
 
     var totalMinutes: Int {
-        switch state {
-        case .loaded(let daily):
-            return daily.sessionCategories.map { $0.totalMinutes }.reduce(0, +)
-        default:
-            return 0
-        }
+        guard case .loaded(let sessions) = state, let date = targetDate else { return 0 }
+        let daily = aggregate(sessions: sessions, for: date)
+        return daily.sessionCategories.map { $0.totalMinutes }.reduce(0, +)
     }
 
     // MARK: - Private

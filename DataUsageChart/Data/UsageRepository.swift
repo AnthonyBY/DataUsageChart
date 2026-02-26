@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - Repository protocol
 @MainActor
 protocol DataRepositoryProtocol {
-    func loadDailyUsage(for date: Date) throws -> DailyUsage
+    func loadSessions() throws -> [Session]
 }
 
 // MARK: - Local JSON implementation
@@ -16,12 +16,7 @@ struct DataRepository: DataRepositoryProtocol {
         self.fileName = fileName
     }
 
-    func loadDailyUsage(for date: Date) throws -> DailyUsage {
-        let sessions = try loadSessions()
-        return aggregate(sessions: sessions, for: date)
-    }
-
-    private func loadSessions() throws -> [Session] {
+    func loadSessions() throws -> [Session] {
         guard let url = Bundle.main.url(forResource: fileName, withExtension: "json") else {
             throw RepositoryError.fileNotFound("\(fileName).json not found in bundle")
         }

@@ -5,22 +5,14 @@
 //  Created by Anton Marchanka on 2/26/26.
 //
 
-
 import SwiftUI
 import Charts
 
-struct CategorySlice: Identifiable {
-    let id = UUID()
-    let category: String
-    let minutes: Int
-}
-
+/// Pie chart by category; takes lazy-computed `[CategorySlice]` (e.g. from `categoryBreakdown(sessions:for:)`).
 struct CategoryPieChartView: View {
-    let daily: DailyUsage
+    let slices: [CategorySlice]
 
     var body: some View {
-        let slices = categorySlices(from: daily)
-
         VStack(alignment: .leading, spacing: 8) {
             Text("By category")
                 .font(.headline)
@@ -48,27 +40,5 @@ struct CategoryPieChartView: View {
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             }
         }
-    }
-
-    private func categorySlices(from daily: DailyUsage) -> [CategorySlice] {
-        let normalized: (String?) -> String = { name in
-            guard let name,
-                  !name.isEmpty,
-                  name.lowercased() != "other"
-            else { return "Other" }
-            return name
-        }
-
-        var sumByCategory: [String: Int] = [:]
-
-        for cat in daily.sessionCategories {
-            let name = normalized(cat.name)
-            sumByCategory[name, default: 0] += cat.totalMinutes
-        }
-
-        return sumByCategory
-            .map { CategorySlice(category: $0.key, minutes: $0.value) }
-            .filter { $0.minutes > 0 }
-            .sorted { $0.minutes > $1.minutes }
     }
 }

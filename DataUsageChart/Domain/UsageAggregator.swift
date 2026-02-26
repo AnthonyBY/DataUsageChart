@@ -57,6 +57,41 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
     return DailyUsage(date: formatDate(targetDate), sessionCategories: apps)
 }
 
+/// Lazy-computed category breakdown from raw sessions for a given day (for pie chart).
+func categoryBreakdown(sessions: [Session], for targetDate: Date) -> [CategorySlice] {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+
+    let dayStart = calendar.startOfDay(for: targetDate)
+    guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
+        return []
+    }
+
+    let daySessions = sessions.filter { s in
+        s.startTimestamp < dayEnd && s.endTimestamp > dayStart
+    }
+
+    let normalized: (String?) -> String = { name in
+        guard let name, !name.isEmpty, name.lowercased() != "other" else { return "Other" }
+        return name
+    }
+
+    var sumByCategory: [String: Int] = [:]
+    for s in daySessions {
+        let clipStart = max(s.startTimestamp, dayStart)
+        let clipEnd = min(s.endTimestamp, dayEnd)
+        let minutes = max(0, Int(clipEnd.timeIntervalSince(clipStart) / 60))
+        guard minutes > 0 else { continue }
+        let name = normalized(s.category)
+        sumByCategory[name, default: 0] += minutes
+    }
+
+    return sumByCategory
+        .map { CategorySlice(category: $0.key, minutes: $0.value) }
+        .filter { $0.minutes > 0 }
+        .sorted { $0.minutes > $1.minutes }
+}
+
 private func formatDate(_ date: Date) -> String {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd"

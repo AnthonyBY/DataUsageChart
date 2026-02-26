@@ -23,19 +23,25 @@ struct DataUsageChartView: View {
                     ProgressView().task { vm.load() }
                 case .error(let message):
                     ErrorStateView(message: message) { vm.load() }
-                case .loaded(let daily):
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 16) {
-                            header(total: vm.totalMinutes, dateString: daily.date)
-                            switch vm.selectedChart {
-                            case .categoryPie:
-                                CategoryPieChartView(daily: daily)
-                            case .usageBar:
-                                usageChart(daily: daily)
+                case .loaded(let sessions):
+                    if let date = vm.targetDate {
+                        let daily = aggregate(sessions: sessions, for: date)
+                        let categorySlices = categoryBreakdown(sessions: sessions, for: date)
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 16) {
+                                header(total: vm.totalMinutes, dateString: daily.date)
+                                switch vm.selectedChart {
+                                case .categoryPie:
+                                    CategoryPieChartView(slices: categorySlices)
+                                case .usageBar:
+                                    usageChart(daily: daily)
+                                }
+                                appList(daily: daily, total: vm.totalMinutes)
                             }
-                            appList(daily: daily, total: vm.totalMinutes)
+                            .padding()
                         }
-                        .padding()
+                    } else {
+                        ProgressView()
                     }
                 }
             }
