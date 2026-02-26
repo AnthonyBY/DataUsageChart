@@ -12,23 +12,25 @@ struct AppUsageRowView: View {
     let total: Int
     var body: some View {
         HStack(spacing: 12) {
-            Circle()
-                .fill(color(for: appUsage.colorHex, app: appUsage.app))
-                .frame(width: 12, height: 12)
-
             VStack(alignment: .leading) {
                 Text(appUsage.app)
                     .font(.body)
-                Text(appUsage.sessionsText)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
 
-                if let category = appUsage.category, !category.isEmpty {
-                    Text(category)
-                        .font(.caption)
+                ProgressView(value: Double(appUsage.totalMinutes), total: Double(total))
+                    .progressViewStyle(.linear)
+                    .tint(color(for: appUsage.colorHex, app: appUsage.app))
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(4)
+                HStack {
+                    Text(appUsage.category ?? "Other")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                    Text(appUsage.sessionsText)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
             }
+            .frame(maxWidth: .infinity)
 
             Spacer()
 
@@ -40,6 +42,7 @@ struct AppUsageRowView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+            .frame(minWidth: 40, alignment: .trailing)
         }
         .padding(.vertical, 8)
     }

@@ -109,9 +109,11 @@ struct DataUsageChartView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Apps")
                 .font(.headline)
-            ForEach(daily.apps.sorted(by: { $0.totalMinutes > $1.totalMinutes })) { app in
-                AppUsageRowView(appUsage: app, total: total)
-                Divider()
+            LazyVStack(alignment: .leading, spacing: 8) {
+                ForEach(daily.apps) { app in
+                    AppUsageRowView(appUsage: app, total: total)
+                    Divider()
+                }
             }
         }
         .padding()
