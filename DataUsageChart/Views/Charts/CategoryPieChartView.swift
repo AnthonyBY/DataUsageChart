@@ -10,7 +10,7 @@ import Charts
 
 /// Pie chart by category; takes lazy-computed `[CategorySlice]` (e.g. from `categoryBreakdown(sessions:for:)`).
 struct CategoryPieChartView: View {
-    let slices: [CategorySlice]
+    let slices: [CategoryPieSlice]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -45,5 +45,5 @@ struct CategoryPieChartView: View {
 }
 
 #Preview {
-    CategoryPieChartView(slices: CategorySlice.previewData)
+    CategoryPieChartView(slices: CategoryPieSlice.previewData)
 }

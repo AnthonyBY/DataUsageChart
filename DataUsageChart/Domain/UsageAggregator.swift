@@ -70,7 +70,7 @@ func appUsageRowItems(sessions: [Session], from targetDate: Date) -> [AppUsageRo
 }
 
 /// Aggregates raw `Session` objects into a `CategorySlice` from targetDate
-func categoryBreakdown(sessions: [Session], from targetDate: Date) -> [CategorySlice] {
+func categoryBreakdown(sessions: [Session], from targetDate: Date) -> [CategoryPieSlice] {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(secondsFromGMT: 0)!
 
@@ -82,7 +82,7 @@ func categoryBreakdown(sessions: [Session], from targetDate: Date) -> [CategoryS
         return s.startTimestamp < dayEnd && s.endTimestamp > dayStart
     }
 
-    var slices: [CategorySlice] = []
+    var slices: [CategoryPieSlice] = []
     for session in daySessions {
         let result = clippedMinutes(withinDayOf: targetDate,
                                     sessionStart: session.startTimestamp,
@@ -97,7 +97,7 @@ func categoryBreakdown(sessions: [Session], from targetDate: Date) -> [CategoryS
             existing.minutes += minutes
             slices[idx] = existing
         } else {
-            slices.append(CategorySlice(category: name, minutes: minutes))
+            slices.append(CategoryPieSlice(category: name, minutes: minutes))
         }
     }
 

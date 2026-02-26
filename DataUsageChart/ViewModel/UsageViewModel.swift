@@ -28,7 +28,7 @@ final class UsageViewModel: ObservableObject {
     /// Derived once when sessions load; not recomputed on re-renders.
     @Published private(set) var dailyUsage: DailyUsage?
     @Published private(set) var rowItems: [AppUsageRowItem] = []
-    @Published private(set) var categorySlices: [CategorySlice] = []
+    @Published private(set) var categorySlices: [CategoryPieSlice] = []
     @Published private(set) var totalMinutes: Int = 0
     /// Display string for the target date (e.g. "Monday, February 23, 2026"); computed once on load.
     @Published private(set) var formattedDateString: String = ""
