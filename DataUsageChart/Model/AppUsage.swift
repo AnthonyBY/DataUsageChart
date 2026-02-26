@@ -13,7 +13,15 @@ struct AppUsage: Codable, Identifiable {
     let category: String?
     var colorHex: String? = nil
     let totalMinutes: Int
+    let sessions: Int
     let hourly: [HourlyUsage]
+}
+
+extension AppUsage {
+    var sessionsText: String {
+        let count = sessions
+        return count == 1 ? "1 session" : "\(count) sessions"
+    }
 }
 
 extension AppUsage {
@@ -22,6 +30,7 @@ extension AppUsage {
         category: "System",
         colorHex: "#FF9500",
         totalMinutes: 78,
+        sessions: 3,
         hourly: HourlyUsage.previewData
     )
 }

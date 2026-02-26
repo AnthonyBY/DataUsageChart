@@ -18,12 +18,13 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
     }
 
     // Group by app and accumulate total + hourly buckets
-    var appBuckets: [String: (category: String?, totalMinutes: Int, hourly: [Int: Int])] = [:]
+    var appBuckets: [String: (category: String?, totalMinutes: Int, hourly: [Int: Int], sessionsCount: Int)] = [:]
     for s in daySessions {
         let minutes = Int(s.endTimestamp.timeIntervalSince(s.startTimestamp) / 60)
-        var entry = appBuckets[s.appName] ?? (category: s.category, totalMinutes: 0, hourly: [:])
+        var entry = appBuckets[s.appName] ?? (category: s.category, totalMinutes: 0, hourly: [:], sessionsCount: 0)
         entry.category = entry.category ?? s.category
         entry.totalMinutes += minutes
+        entry.sessionsCount += 1
 
         // Distribute minutes per hour boundaries
         var cursor = s.startTimestamp
@@ -42,7 +43,12 @@ func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
 
     let apps: [AppUsage] = appBuckets.map { appName, v in
         let hourly = (0...23).map { h in HourlyUsage(hour: h, minutes: v.hourly[h] ?? 0) }
-        return AppUsage(app: appName, category: v.category, totalMinutes: v.totalMinutes, hourly: hourly)
+        return AppUsage(app: appName,
+                        category: v.category,
+                        colorHex: nil,
+                        totalMinutes: v.totalMinutes,
+                        sessions: v.sessionsCount,
+                        hourly: hourly)
     }.sorted { $0.totalMinutes > $1.totalMinutes }
 
     let formatter = DateFormatter()

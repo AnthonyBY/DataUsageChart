@@ -13,12 +13,15 @@ struct AppUsageRowView: View {
     var body: some View {
         HStack(spacing: 12) {
             Circle()
-                .fill(appUsage.colorHex?.hexColor ?? .clear)
+                .fill(color(for: appUsage.colorHex, app: appUsage.app))
                 .frame(width: 12, height: 12)
 
             VStack(alignment: .leading) {
                 Text(appUsage.app)
                     .font(.body)
+                Text(appUsage.sessionsText)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
                 if let category = appUsage.category, !category.isEmpty {
                     Text(category)
@@ -45,6 +48,14 @@ struct AppUsageRowView: View {
         guard total > 0 else { return "0%" }
         let p = (Double(part) / Double(total)) * 100
         return String(format: "%.0f%%", p)
+    }
+
+    private func color(for hex: String?, app: String) -> Color {
+        if let hex, let c = Color(hex: hex) { return c }
+        // deterministic fallback color per app name
+        let hash = abs(app.hashValue)
+        let hue = Double(hash % 256) / 255.0
+        return Color(hue: hue, saturation: 0.55, brightness: 0.9)
     }
 }
 

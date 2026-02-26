@@ -137,13 +137,8 @@ struct DataUsageChartView: View {
         }
         return date
     }
+}
 
-
-    private func color(for hex: String?, app: String) -> Color {
-        if let hex, let c = Color(hex: hex) { return c }
-        // deterministic fallback color per app name
-        let hash = abs(app.hashValue)
-        let hue = Double(hash % 256) / 255.0
-        return Color(hue: hue, saturation: 0.55, brightness: 0.9)
-    }
+#Preview {
+    DataUsageChartView()
 }
