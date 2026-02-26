@@ -1,12 +1,12 @@
 import Foundation
 
-struct HourlyUsage: Codable, Identifiable {
+struct HourlyUsage: Codable, Identifiable, Equatable {
     var id = UUID()
     let hour: Int
     let minutes: Int
 }
 
-struct DailyUsage: Codable {
+struct DailyUsage: Codable, Equatable {
     let date: String
     let sessionCategories: [SessionCategory]
 }

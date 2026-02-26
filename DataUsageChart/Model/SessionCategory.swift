@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SessionCategory: Codable, Identifiable {
+struct SessionCategory: Codable, Identifiable, Equatable {
     var id = UUID()
     let name: String?
     let appName: String

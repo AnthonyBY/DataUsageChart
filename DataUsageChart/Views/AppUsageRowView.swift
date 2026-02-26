@@ -55,9 +55,9 @@ struct AppUsageRowView: View {
         let percent = (Double(part) / Double(total)) * 100
 
         if percent < 1, percent > 0 {
-            return String(format: "%.1f%%", p)
+            return String(format: "%.1f%%", percent)
         } else {
-            return String(format: "%.0f%%", p)
+            return String(format: "%.0f%%", percent)
         }
     }
 }

@@ -23,11 +23,12 @@ struct DataUsageChartView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if let error = vm.errorMessage {
-                    ErrorStateView(message: error) {
-                        vm.load()
-                    }
-                } else if let daily = vm.daily {
+                switch vm.state {
+                case .loading:
+                    ProgressView().task { vm.load() }
+                case .error(let message):
+                    ErrorStateView(message: message) { vm.load() }
+                case .loaded(let daily):
                     ScrollView {
                         VStack(alignment: .leading, spacing: 16) {
                             header(total: vm.totalMinutes, dateString: daily.date)
@@ -37,8 +38,6 @@ struct DataUsageChartView: View {
                         }
                         .padding()
                     }
-                } else {
-                    ProgressView().task { vm.load() }
                 }
             }
             .navigationTitle("Usage")

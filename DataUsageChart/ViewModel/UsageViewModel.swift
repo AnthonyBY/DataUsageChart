@@ -1,11 +1,15 @@
 import Foundation
 import Combine
 
+enum LoadState: Equatable {
+    case loading
+    case loaded(DailyUsage)
+    case error(String)
+}
+
 @MainActor
 final class UsageViewModel: ObservableObject {
-    @Published private(set) var daily: DailyUsage?
-    @Published private(set) var errorMessage: String?
-    @Published private(set) var isLoading = false
+    @Published private(set) var state: LoadState = .loading
 
     private let repository: UsageRepository
     private let targetDayString = "2026-02-23" // TODO: Change to current date or add UI element for this
@@ -19,26 +23,30 @@ final class UsageViewModel: ObservableObject {
     }
 
     func load() {
-        guard !isLoading else { return }
-        isLoading = true
-        errorMessage = nil
+        switch state {
+        case .loading: return
+        default: break
+        }
+        state = .loading
 
         Task {
-            defer { isLoading = false }
-
             do {
                 let date = try makeTargetDate()
                 let daily = try repository.loadDailyUsage(for: date)
-                self.daily = daily
+                self.state = .loaded(daily)
             } catch {
-                self.errorMessage = error.localizedDescription
+                self.state = .error(error.localizedDescription)
             }
         }
     }
 
     var totalMinutes: Int {
-        guard let daily else { return 0 }
-        return daily.sessionCategories.map { $0.totalMinutes }.reduce(0, +)
+        switch state {
+        case .loaded(let daily):
+            return daily.sessionCategories.map { $0.totalMinutes }.reduce(0, +)
+        default:
+            return 0
+        }
     }
 
     // MARK: - Private
