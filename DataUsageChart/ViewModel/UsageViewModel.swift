@@ -7,19 +7,26 @@ enum LoadState: Equatable {
     case error(String)
 }
 
+enum ChartSelection: Equatable {
+    case categoryPie
+    case usageBar
+}
+
 @MainActor
 final class UsageViewModel: ObservableObject {
     @Published private(set) var state: LoadState = .loading
+    @Published var selectedChart: ChartSelection = .categoryPie
 
     private let repository: UsageRepository
     private let targetDayString = "2026-02-23" // TODO: Change to current date or add UI element for this
 
-    init(repository: UsageRepository) {
+    init(repository: UsageRepository, selectedChart: ChartSelection = .categoryPie) {
         self.repository = repository
+        self.selectedChart = selectedChart
     }
 
-    convenience init() {
-        self.init(repository: LocalJSONUsageRepository())
+    convenience init(selectedChart: ChartSelection = .categoryPie) {
+        self.init(repository: LocalJSONUsageRepository(), selectedChart: selectedChart)
     }
 
     func load() {

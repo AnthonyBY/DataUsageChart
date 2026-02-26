@@ -32,8 +32,12 @@ struct DataUsageChartView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 16) {
                             header(total: vm.totalMinutes, dateString: daily.date)
-                            categoryPieChart(daily: daily)
-                            usageChart(daily: daily)
+                            switch vm.selectedChart {
+                            case .categoryPie:
+                                categoryPieChart(daily: daily)
+                            case .usageBar:
+                                usageChart(daily: daily)
+                            }
                             appList(daily: daily, total: vm.totalMinutes)
                         }
                         .padding()
