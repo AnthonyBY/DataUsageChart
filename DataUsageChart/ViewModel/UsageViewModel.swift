@@ -22,7 +22,6 @@ enum ChartSelection: Equatable {
 @MainActor
 final class UsageViewModel: ObservableObject {
     @Published private(set) var state: LoadState = .loading
-    @Published private(set) var targetDate: Date?
     @Published var selectedChart: ChartSelection = .categoryPie
 
     /// Derived once when sessions load; not recomputed on re-renders.
@@ -31,6 +30,7 @@ final class UsageViewModel: ObservableObject {
     @Published private(set) var categorySlices: [CategoryPieSlice] = []
     @Published private(set) var totalMinutes: Int = 0
     /// Display string for the target date (e.g. "Monday, February 23, 2026"); computed once on load.
+    @Published private(set) var targetDate: Date?
     @Published private(set) var formattedDateString: String = ""
 
     private let repository: DataRepositoryProtocol
