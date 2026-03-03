@@ -49,7 +49,8 @@ struct HourlyUsageBarChartView: View {
                 Chart(points) { p in
                     BarMark(
                         x: .value("Hour", p.hour),
-                        y: .value("Minutes", p.minutes)
+                        y: .value("Minutes", p.minutes),
+                        width: 8
                     )
                     .foregroundStyle(by: .value("App", p.app))
                 }

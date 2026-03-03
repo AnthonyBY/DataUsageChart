@@ -89,6 +89,7 @@ struct DataUsageChartView: View {
             .padding()
         }
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .onAppear { print("appList appear") }
     }
 }
 
