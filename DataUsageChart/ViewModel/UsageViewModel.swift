@@ -59,16 +59,16 @@ final class UsageViewModel: ObservableObject {
                 guard let targetDate = DateParsingHelper.parseYYYYMMDD(targetDayString) else {
                     throw RepositoryError.invalidTargetDate
                 }
+                formattedDateString = targetDayString.formattedAsFullDateDisplay()
 
                 let sessions = try repository.loadSessions()
 
-                totalMinutes = DailyUsageReporting.totalMinutes(sessions: sessions, from: targetDate)
+                totalMinutes = PerformanceMeter.measure("totalMinutes") {
+                    DailyUsageReporting.totalMinutes(sessions: sessions, from: targetDate)
+                }
 
-                let dailyUsage = DailyUsageReporting.dailyUsage(sessions: sessions, for: targetDate)
-                self.dailyUsage = dailyUsage
-
-                formattedDateString = PerformanceMeter.measure("formattedAsFullDateDisplay") {
-                    dailyUsage.date.formattedAsFullDateDisplay()
+                dailyUsage = PerformanceMeter.measure("dailyUsage") {
+                    DailyUsageReporting.dailyUsage(sessions: sessions, for: targetDate)
                 }
 
                 categorySlices = PerformanceMeter.measure("categoryBreakdown") {
