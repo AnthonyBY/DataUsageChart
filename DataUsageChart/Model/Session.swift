@@ -9,10 +9,10 @@ import Foundation
 
 struct Session: Codable, Identifiable, Equatable {
     let id: String
-    let appName: String
+    let appName: String?
     let category: String?
-    let startTimestamp: Date
-    let endTimestamp: Date
+    let startTimestamp: Date?
+    let endTimestamp: Date?
 
     enum CodingKeys: String, CodingKey {
         case id = "session_id"

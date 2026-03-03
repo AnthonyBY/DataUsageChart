@@ -17,7 +17,8 @@ enum DailyUsageReporting {
         let calendar = Self.calendar
         let dayStart = calendar.startOfDay(for: targetDate)
         guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return 0 }
-        let daySessions = sessions.filter { s in s.startTimestamp < dayEnd && s.endTimestamp > dayStart }
+        let validSessions = sessions.filter { Self.hasValidTimestamps($0) }
+        let daySessions = validSessions.filter { s in s.startTimestamp! < dayEnd && s.endTimestamp! > dayStart }
         return daySessions.reduce(0) { sum, s in
             sum + Self.clippedMinutes(withinDayOf: targetDate, session: s, calendar: calendar).minutes
         }
@@ -30,14 +31,16 @@ enum DailyUsageReporting {
         guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
             return DailyUsage(date: Self.formatDate(targetDate), sessionCategories: [])
         }
-        let daySessions = sessions.filter { s in s.startTimestamp < dayEnd && s.endTimestamp > dayStart }
+        let validSessions = sessions.filter { Self.hasValidTimestamps($0) }
+        let daySessions = validSessions.filter { s in s.startTimestamp! < dayEnd && s.endTimestamp! > dayStart }
 
         var appBuckets: [String: (category: String, totalMinutes: Int, hourly: [Int: Int], sessionsCount: Int)] = [:]
         for s in daySessions {
+            guard let appName = Self.normalizedAppName(s.appName) else { continue }
             let result = Self.clippedMinutes(withinDayOf: targetDate, session: s, calendar: calendar)
             guard result.minutes > 0 else { continue }
 
-            var entry = appBuckets[s.appName] ?? (category: Self.normalizedCategory(s.category), totalMinutes: 0, hourly: [:], sessionsCount: 0)
+            var entry = appBuckets[appName] ?? (category: Self.normalizedCategory(s.category), totalMinutes: 0, hourly: [:], sessionsCount: 0)
             entry.totalMinutes += result.minutes
             entry.sessionsCount += 1
             var cursor = result.clipStart
@@ -50,7 +53,7 @@ enum DailyUsageReporting {
                 entry.hourly[hourComp, default: 0] += segMinutes
                 cursor = segmentEnd
             }
-            appBuckets[s.appName] = entry
+            appBuckets[appName] = entry
         }
 
         let apps: [SessionCategory] = appBuckets.map { appName, v in
@@ -66,7 +69,8 @@ enum DailyUsageReporting {
         let calendar = Self.calendar
         let dayStart = calendar.startOfDay(for: targetDate)
         guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else { return [] }
-        let daySessions = sessions.filter { s in s.startTimestamp < dayEnd && s.endTimestamp > dayStart }
+        let validSessions = sessions.filter { Self.hasValidTimestamps($0) }
+        let daySessions = validSessions.filter { s in s.startTimestamp! < dayEnd && s.endTimestamp! > dayStart }
 
         var slices: [CategoryPieSlice] = []
         for session in daySessions {
@@ -87,18 +91,20 @@ enum DailyUsageReporting {
     /// App list row items for the target day.
     static func appUsageRowItems(sessions: [Session], from targetDate: Date) -> [AppUsageRowItem] {
         let calendar = Self.calendar
+        let validSessions = sessions.filter { Self.hasValidTimestamps($0) }
         var items: [AppUsageRowItem] = []
-        for session in sessions {
+        for session in validSessions {
+            guard let appName = Self.normalizedAppName(session.appName) else { continue }
             let result = Self.clippedMinutes(withinDayOf: targetDate, session: session, calendar: calendar)
             guard result.minutes > 0 else { continue }
             let categoryName = Self.normalizedCategory(session.category)
-            if let idx = items.firstIndex(where: { $0.appName == session.appName }) {
+            if let idx = items.firstIndex(where: { $0.appName == appName }) {
                 var existing = items[idx]
                 existing.totalMinutes += result.minutes
                 existing.sessionsCount += 1
                 items[idx] = existing
             } else {
-                items.append(AppUsageRowItem(appName: session.appName, categoryName: categoryName, totalMinutes: result.minutes, sessionsCount: 1, colorHex: nil))
+                items.append(AppUsageRowItem(appName: appName, categoryName: categoryName, totalMinutes: result.minutes, sessionsCount: 1, colorHex: nil))
             }
         }
         return items.sorted { $0.totalMinutes > $1.totalMinutes }
@@ -117,16 +123,33 @@ enum DailyUsageReporting {
         guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
             return (0, dayStart, dayStart)
         }
-        let clipStart = max(session.startTimestamp, dayStart)
-        let clipEnd = min(session.endTimestamp, min(dayEnd, now))
+        guard let start = session.startTimestamp, let end = session.endTimestamp else {
+            return (0, dayStart, dayStart)
+        }
+        let clipStart = max(start, dayStart)
+        let clipEnd = min(end, min(dayEnd, now))
         let minutes = max(0, Int(clipEnd.timeIntervalSince(clipStart) / 60))
         return (minutes, clipStart, clipEnd)
+    }
+
+    /// Session is used only if both timestamps are non-nil and endTimestamp > startTimestamp.
+    private static func hasValidTimestamps(_ s: Session) -> Bool {
+        guard let start = s.startTimestamp, let end = s.endTimestamp else { return false }
+        return end > start
     }
 
     private static func normalizedCategory(_ name: String?) -> String {
         guard let name, !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return "Other" }
         let lower = name.lowercased()
         if lower == "other" || lower == "others" { return "Other" }
+        return name
+    }
+
+    /// Normalizes app name; returns nil if it's effectively empty so such sessions can be skipped.
+    private static func normalizedAppName(_ name: String?) -> String? {
+        guard let name = name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
+            return nil
+        }
         return name
     }
 

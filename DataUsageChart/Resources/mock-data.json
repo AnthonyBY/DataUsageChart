@@ -1,5 +1,5 @@
 [
-  {"session_id": "S-000", "app_name": "TikTok", "category": "Social", "start_timestamp": "2026-02-22T23:45:00Z", "end_timestamp": "2026-02-23T00:30:00Z"},
+  {"session_id": "S-000", "app_name": null, "category": "Social", "start_timestamp": null, "end_timestamp": "2026-02-23T00:30:00Z"},
   {"session_id": "S-001", "app_name": "Settings", "category": "System", "start_timestamp": "2026-02-23T00:32:00Z", "end_timestamp": "2026-02-23T00:33:15Z"},
   {"session_id": "S-002", "app_name": "Spotify", "category": "Entertainment", "start_timestamp": "2026-02-23T00:35:00Z", "end_timestamp": "2026-02-23T01:15:00Z"},
   {"session_id": "S-003", "app_name": "Instagram", "category": "Social", "start_timestamp": "2026-02-23T00:40:00Z", "end_timestamp": "2026-02-23T00:55:00Z"},
