@@ -13,23 +13,19 @@ struct DataUsageChartView: View {
     @StateObject private var vm = UsageViewModel()
 
     var body: some View {
-        NavigationStack {
-            Group {
-                switch vm.state {
-                case .loading:
-                    ProgressView().task { vm.load() }
-                case .error(let message):
-                    ErrorStateView(message: message) { vm.load() }
-                case .loaded:
-                    if let daily = vm.dailyUsage {
-                        contentScrollView(daily: daily)
-                    } else {
-                        ProgressView()
-                    }
+        Group {
+            switch vm.state {
+            case .loading:
+                ProgressView().task { vm.load() }
+            case .error(let message):
+                ErrorStateView(message: message) { vm.load() }
+            case .loaded:
+                if let daily = vm.dailyUsage {
+                    contentScrollView(daily: daily)
+                } else {
+                    ProgressView()
                 }
             }
-            .navigationTitle("Usage")
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
