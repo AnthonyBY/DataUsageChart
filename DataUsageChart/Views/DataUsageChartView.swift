@@ -59,7 +59,7 @@ struct DataUsageChartView: View {
                 case .usageBar:
                     HourlyUsageBarChartView(daily: daily)
                 }
-                appList(rowItems: vm.rowItems, total: vm.totalMinutes)
+                appList(rowItems: vm.appRowItems, total: vm.totalMinutes)
             }
         }
     }

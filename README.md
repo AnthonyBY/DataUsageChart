@@ -44,7 +44,7 @@ The app loads usage from `DataUsageChart/Resources/mock-data.json` and displays 
 DataUsageChart/
 ├── App/                    # App entry point
 ├── Data/                   # Repository (loads JSON sessions)
-├── Domain/                 # UsageAggregator (sessions → daily usage, categories, row items)
+├── Domain/                 # DailyUsageReporting (sessions → daily usage, categories, row items)
 ├── Model/                  # Session, DailyUsage, SessionCategory, AppUsageRowItem, CategorySlice, etc.
 ├── ViewModel/              # UsageViewModel (load state, derived data)
 ├── Views/                  # DataUsageChartView, AppUsageRowView, ErrorStateView

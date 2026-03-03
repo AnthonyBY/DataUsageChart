@@ -8,7 +8,7 @@
 import SwiftUI
 import Charts
 
-/// Pie chart by category; takes lazy-computed `[CategorySlice]` (e.g. from `categoryBreakdown(sessions:for:)`).
+/// Pie chart by category; takes lazy-computed `[CategoryPieSlice]` (e.g. from `DailyUsageReporting.categoryBreakdown(sessions:from:)`).
 struct CategoryPieChartView: View {
     let slices: [CategoryPieSlice]
 

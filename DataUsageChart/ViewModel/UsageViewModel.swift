@@ -26,7 +26,7 @@ final class UsageViewModel: ObservableObject {
 
     /// Derived once when sessions load; not recomputed on re-renders.
     @Published private(set) var dailyUsage: DailyUsage?
-    @Published private(set) var rowItems: [AppUsageRowItem] = []
+    @Published private(set) var appRowItems: [AppUsageRowItem] = []
     @Published private(set) var categorySlices: [CategoryPieSlice] = []
     @Published private(set) var totalMinutes: Int = 0
     /// Display string for the target date (e.g. "Monday, February 23, 2026"); computed once on load.
@@ -49,7 +49,7 @@ final class UsageViewModel: ObservableObject {
     func load() {
         state = .loading
         dailyUsage = nil
-        rowItems = []
+        appRowItems = []
         categorySlices = []
         totalMinutes = 0
         formattedDateString = ""
@@ -62,9 +62,9 @@ final class UsageViewModel: ObservableObject {
 
                 let sessions = try repository.loadSessions()
 
-                totalMinutes = aggregateTotalMinutes(sessions: sessions, from: targetDate)
+                totalMinutes = DailyUsageReporting.totalMinutes(sessions: sessions, from: targetDate)
 
-                let dailyUsage = aggregate(sessions: sessions, for: targetDate)
+                let dailyUsage = DailyUsageReporting.dailyUsage(sessions: sessions, for: targetDate)
                 self.dailyUsage = dailyUsage
 
                 formattedDateString = PerformanceMeter.measure("formattedAsFullDateDisplay") {
@@ -72,11 +72,11 @@ final class UsageViewModel: ObservableObject {
                 }
 
                 categorySlices = PerformanceMeter.measure("categoryBreakdown") {
-                    categoryBreakdown(sessions: sessions, from: targetDate)
+                    DailyUsageReporting.categoryBreakdown(sessions: sessions, from: targetDate)
                 }
 
-                rowItems = PerformanceMeter.measure("appUsageRowItems") {
-                    appUsageRowItems(sessions: sessions, from: targetDate)
+                appRowItems = PerformanceMeter.measure("appUsageRowItems") {
+                    DailyUsageReporting.appUsageRowItems(sessions: sessions, from: targetDate)
                 }
 
                 state = .loaded(sessions)
