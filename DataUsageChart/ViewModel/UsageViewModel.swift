@@ -56,22 +56,29 @@ final class UsageViewModel: ObservableObject {
 
         Task {
             do {
-                guard let date = DateParsingHelper.parseYYYYMMDD(targetDayString) else {
+                guard let targetDate = DateParsingHelper.parseYYYYMMDD(targetDayString) else {
                     throw RepositoryError.invalidTargetDate
                 }
 
                 let sessions = try repository.loadSessions()
 
-                let dailyUsage = aggregate(sessions: sessions, for: date)
+                totalMinutes = aggregateTotalMinutes(sessions: sessions, from: targetDate)
 
-                targetDate = date
+                let dailyUsage = aggregate(sessions: sessions, for: targetDate)
                 self.dailyUsage = dailyUsage
-                formattedDateString = dailyUsage.date.formattedAsFullDateDisplay()
-                categorySlices = categoryBreakdown(sessions: sessions, from: date)
-                rowItems = appUsageRowItems(sessions: sessions, from: date)
-                totalMinutes = dailyUsage.sessionCategories
-                    .map { $0.totalMinutes }
-                    .reduce(0, +)
+
+                formattedDateString = PerformanceMeter.measure("formattedAsFullDateDisplay") {
+                    dailyUsage.date.formattedAsFullDateDisplay()
+                }
+
+                categorySlices = PerformanceMeter.measure("categoryBreakdown") {
+                    categoryBreakdown(sessions: sessions, from: targetDate)
+                }
+
+                rowItems = PerformanceMeter.measure("appUsageRowItems") {
+                    appUsageRowItems(sessions: sessions, from: targetDate)
+                }
+
                 state = .loaded(sessions)
             } catch {
                 self.state = .error(error.localizedDescription)
@@ -79,3 +86,4 @@ final class UsageViewModel: ObservableObject {
         }
     }
 }
+

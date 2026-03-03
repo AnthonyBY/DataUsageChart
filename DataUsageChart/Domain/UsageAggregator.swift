@@ -9,6 +9,31 @@ import Foundation
 
 // MARK: - Aggregation / business logic
 
+/// Total minutes of usage on the target day, computed from sessions (clipped to that day).
+func aggregateTotalMinutes(sessions: [Session], from targetDate: Date) -> Int {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+
+    let dayStart = calendar.startOfDay(for: targetDate)
+    guard let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayStart) else {
+        return 0
+    }
+
+    let daySessions = sessions.filter { s in
+        s.startTimestamp < dayEnd && s.endTimestamp > dayStart
+    }
+
+    var total = 0
+    for s in daySessions {
+        let result = clippedMinutes(withinDayOf: targetDate,
+                                    sessionStart: s.startTimestamp,
+                                    sessionEnd: s.endTimestamp,
+                                    calendar: calendar)
+        total += result.minutes
+    }
+    return total
+}
+
 /// Safely clips a session's interval to a target day and returns whole minutes within that clip.
 /// Returns 0 if there is no overlap or if the interval is in the future relative to `now`.
 private func clippedMinutes(withinDayOf targetDate: Date,
@@ -105,6 +130,7 @@ func categoryBreakdown(sessions: [Session], from targetDate: Date) -> [CategoryP
         .filter { $0.minutes > 0 }
         .sorted { $0.minutes > $1.minutes }
 }
+
 
 /// Aggregates raw `Session` objects into a `DailyUsage` model for a specific calendar day (can be used for Bar Hours Chart)
 func aggregate(sessions: [Session], for targetDate: Date) -> DailyUsage {
