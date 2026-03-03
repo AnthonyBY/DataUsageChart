@@ -61,7 +61,7 @@ final class UsageViewModel: ObservableObject {
                 }
                 formattedDateString = targetDayString.formattedAsFullDateDisplay()
 
-                let sessions = try repository.loadSessions()
+                let sessions = try await repository.loadSessions()
 
                 totalMinutes = PerformanceMeter.measure("totalMinutes") {
                     DailyUsageReporting.totalMinutes(sessions: sessions, from: targetDate)

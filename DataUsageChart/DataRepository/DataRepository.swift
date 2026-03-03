@@ -9,13 +9,11 @@ import Foundation
 import SwiftUI
 
 // MARK: - Repository protocol
-@MainActor
-protocol DataRepositoryProtocol {
-    func loadSessions() throws -> [Session]
+protocol DataRepositoryProtocol: Sendable {
+    func loadSessions() async throws -> [Session]
 }
 
 // MARK: - Local JSON implementation
-@MainActor
 struct DataRepository: DataRepositoryProtocol {
     private let fileName: String
 
@@ -23,7 +21,7 @@ struct DataRepository: DataRepositoryProtocol {
         self.fileName = fileName
     }
 
-    func loadSessions() throws -> [Session] {
+    func loadSessions() async throws -> [Session] {
         guard let url = Bundle.main.url(forResource: fileName, withExtension: "json") else {
             throw RepositoryError.fileNotFound("\(fileName).json not found in bundle")
         }
